@@ -7,9 +7,13 @@ import "hardhat/console.sol";
 contract WavePortal {
 
   uint256 private seed;
+  address lastLuckyWinner;
+  address lastWavedAddress;
+  uint256 lastWavedTimestamp;
+
 
   // An event to listen for new waves
-  event NewWave(address indexed from, uint256 timestamp, string message);
+  event NewWave(address indexed from, uint256 timestamp, string message, address lastLuckyWinner,  address lastWavedAddress,  uint256 lastWavedTimestamp);
 
   // A struct to model a single wave
   struct Wave {
@@ -38,7 +42,7 @@ contract WavePortal {
 
   function waveAtMe(string memory _message) public {
 
-    require(lastWavedAt[msg.sender] + 15 seconds  < block.timestamp, "Wait 15m");
+    require(lastWavedAt[msg.sender] + 15 seconds  < block.timestamp, "Must wait 15 seconds before waving again.");
 
     /*
      * Update the current timestamp we have for the user
@@ -62,13 +66,18 @@ contract WavePortal {
 
         (bool success,) = (msg.sender).call{value: prizeAmount}("");
         require(success, "Failed to withdraw money from contract.");
+
+        lastLuckyWinner = msg.sender;
         console.log("Won some ethers");
      }
 
-    emit NewWave(msg.sender, block.timestamp, _message);
+    emit NewWave(msg.sender, block.timestamp, _message, lastLuckyWinner, lastWavedAddress, lastWavedTimestamp);
 
     // Add sender's address to the addresser's list
     allSenderAddresses.push(msg.sender);
+
+    lastWavedAddress = msg.sender;
+    lastWavedTimestamp = block.timestamp;
   }
 
    // Local variable
@@ -84,6 +93,18 @@ contract WavePortal {
 
   function getSendersList() public view returns(address[] memory){
     return allSenderAddresses;
+  }
+
+  function getLastWavedAddress() public view returns(address){
+    return lastWavedAddress;
+  }
+
+  function getLastLuckyWinner() public view returns(address){
+    return lastLuckyWinner;
+  }
+
+  function getLastWavedTime() public view returns(uint256){
+    return lastWavedTimestamp;
   }
 
   

@@ -24,8 +24,12 @@ const main = async () => {
   let waveTxn1 = await waveContract.waveAtMe('I am Elliot and I just waved!')
   await waveTxn1.wait()
 
-  let waveTxn2 = await waveContract.waveAtMe('I am Kachi and I just waved!')
+  let waveTxn2 = await waveContract.connect(randomPerson).waveAtMe('I am Kachi and I just waved!')
   await waveTxn2.wait()
+
+  let lastWavedAddress = await waveContract.getLastWavedAddress()
+  let lastLuckyWinner = await waveContract.getLastLuckyWinner()
+  let lastWavedTime = await waveContract.getLastWavedTime()
 
   /*
    * Get Contract balance to see what happened!
